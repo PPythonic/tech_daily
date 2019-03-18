@@ -98,17 +98,106 @@
 
 # print(Student.a)
 
-class MyMeta(type):
-    def __call__(self, *args, **kwargs):
-        print('此类正在执行call', self.__name__)
+# class MyMeta(type):
+#     def __call__(self, *args, **kwargs):
+#         print('此类正在执行call', self.__name__)
 
-        obj = object.__new__(self)
-        self.__init__(obj, *args, **kwargs)
-        return obj
+#         obj = object.__new__(self)
+#         self.__init__(obj, *args, **kwargs)
+#         return obj
 
-class Student(object, metaclass=MyMeta):
-    pass
+# class Student(object, metaclass=MyMeta):
+#     pass
 
-stu1 = Student()
+# stu1 = Student()
 
-print(stu1)
+# print(stu1)
+
+# class Student:
+#     __instance = None
+
+#     def __new__(cls, *args, **kwargs):
+#         if cls.__instance is None:
+#             obj = object.__new__(cls)  # 返回一个空对象
+#             cls.__init__(obj, *args, **kwargs)
+#             cls.__instance = obj
+
+#         return cls.__instance
+
+# stu1 = Student()
+# stu2 = Student()
+# print(stu1 is stu2)
+
+# class Animal:
+#     def f(self):
+#         print("这是Animal")
+#         print('self 是', self)
+
+# class People(Animal):
+#     def f(self):
+#         print('这是People')
+#         super().f()
+
+# class Student(People):
+#     def f(self):
+#         print('这是Student')
+#         super().f()
+
+# stu1 = Student()
+# print(stu1)
+# stu1.f()       
+
+# class Student:
+#     def eat(self):
+#         print('eating')
+
+# stu1 = Student()
+# stu2 = Student()
+
+# print(stu1.eat)
+# print(stu2.eat)
+
+# class Student:
+#     def eat(self):
+#         print('eating')
+
+# stu1 = Student()
+# print(stu1)
+# bound_func = stu1.eat
+# print(bound_func.__self__)
+# print(bound_func.__func__)
+
+
+# class Wrapper:
+#     def __init__(self, func):
+#         self.func = func
+
+#     def __call__(self, *args, **kwargs):
+#         print('start')
+#         self.func()
+#         print('end')
+
+# @Wrapper
+# def show():
+#     print('这是show函数')
+
+# show()
+
+class Wrapper:
+    def __init__(self, key):
+        self.key = key
+
+    def __call__(self, func):
+        self.func = func
+
+        def inner(*args, **kw):
+            print('start')
+            self.func(*args, **kw)
+            print('end')
+        return inner
+
+@Wrapper('key')
+def show():
+    print('这里是show函数')
+
+show()

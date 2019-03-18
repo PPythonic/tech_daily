@@ -507,3 +507,167 @@ stu1 = Student()
 print(stu1)
 ```
 > 类对象在实例化的时候, 会调用`call`方法(此方法应该是元类给予的), `call`方法将会调用`object`的new方法得到一个空对象, 然后对此空对象进行初始化, 然后返回此对象
+
+## 7.单例模式的使用
+### 通过类的new方法操作
+```python
+class Student:
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            obj = object.__new__(cls)  # 返回一个空对象
+            cls.__init__(obj, *args, **kwargs)
+
+            cls.__instance = obj
+        return cls.__instance
+
+stu1 = Student()
+stu2 = Student()
+print(stu1 is stu2) # True
+```
+
+### 通过元类操作
+```python
+class MyMeta(type):
+    def __init__(self, *args, **kwargs):
+        self.instance = None
+
+    def __call__(self, *agrs, **kwargs):
+        if self.instance is None:
+            obj = object.__new__(self)
+            self.__init__(obj, *args, **kwargs)
+            self.instance = obj
+
+        return self.instance
+
+class Student(objext, metaclass=MyMeta):
+    pass
+
+stu1 = Student()
+stu2 = Student()
+print(stu1 is stu2)  # True
+```
+> 个人觉得直接使用类的new操作更方便
+
+# 十一. 几个技术问题
+## 1. __new__方法
+> `new`方法是生成对象的方法, 在元类中, 使用`type`元类的`new`方法生成类对象
+> `new`方法应该是调用底层接口在内存中申请一个空间
+> `new`方法返回一个空对象
+
+## 2. __init__方法
+>`init`是对对象进行初始化的方法, 在元类中是对类对象进行初始化; 在类中, 是对对象进行初始化. `init`方法返回值是`None`
+
+## 3. super()调用时传入的都是子类对象
+```python
+class Animal:
+    def f(self):
+        print("这是Animal")
+        print('self 是', self)
+
+class People(Animal):
+    def f(self):
+        print('这是People')
+        super().f()
+
+class Student(People):
+    def f(self):
+        print('这是Student')
+        super().f()
+
+stu1 = Student()
+print(stu1)  # 和stu1.f()中的对象是同一个
+stu1.f()
+```
+
+## 4. 为啥对象的绑定方法id不同
+```python
+class Student:
+    def eat(self):
+        print('eating')
+
+stu1 = Student()
+stu2 = Student()
+
+print(stu1.eat)  # <bound method Student.eat of <__main__.Student object at 0x0000024C9C1EB518>>
+print(stu2.eat)  # <bound method Student.eat of <__main__.Student object at 0x0000024C9C1EB5C0>>
+```
+两个对象, 都是使用同一个函数, 但是绑定方法地址却不同
+绑定方法也是对象, 是对普通函数和对象的封装
+```python
+class Student:
+    def eat(self):
+        print('eating')
+
+stu1 = Student()
+print(stu1) # <__main__.Student object at 0x00000280A26DB518>
+bound_func = stu1.eat
+print(bound_func.__self__) # <__main__.Student object at 0x00000280A26DB518>
+print(bound_func.__func__) # <function Student.eat at 0x00000280A26D69D8>
+```
+> 绑定方法是一个对象
+
+> 绑定方法将实例化对象和函数对象封装在一起
+
+> 绑定方法在调用的时候应该执行函数对象, 并把实例化对象传入给函数self参数
+
+## 5. 类是装饰器
+### 没有参数的装饰器
+```python
+class Wrapper:
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print('start')
+        self.func(*args, **kwargs)
+        print('end')
+
+@Wrapper
+def show():
+    print('这是show函数')
+
+show()
+# start
+# 这是show函数
+# end
+```
+### 有参数的装饰器
+```python
+
+class Wrapper:
+    def __init__(self, key):
+        self.key = key
+
+    def __call__(self, func):
+        self.func = func
+
+        def inner(*args, **kw):
+            print('start')
+            self.func(*args, **kw)
+            print('end')
+        return inner
+
+@Wrapper('key')
+def show():
+    print('这是show函数')
+
+show()
+# start
+# 这是show函数
+# end
+```
+
+## 6. 对象的[]和反射的不同
+```python
+class Student:
+    a = 2
+
+print(getattr(Student, 'a'))  # 2, getattr是获取对象的属性
+
+dic = {
+    'a': 100,
+}
+print(getattr(dic, 'a'))  # AttributeError: 'dict' object has no attribute 'a'.  字典中的key需要使用dic['a']访问
+```
