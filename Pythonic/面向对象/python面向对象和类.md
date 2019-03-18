@@ -115,7 +115,7 @@ print(Student.count) # AttributeError: type object 'Student' has no attribute 'c
 ## 5. 类中的方法(基础)
 类中的方法就是一个普通的函数定义, 此函数属性也保存在`__dict__`字典中, 和数据属性一样, 可以通过 类名.函数名 的方式来访问和修改, 如
 ```python
-def say():
+def say(something):
     print('全局的say方法, hi')
 
 class Student:
@@ -137,3 +137,79 @@ Student.say('something') # # AttributeError: type object 'Student' has no attrib
 **注意:**
 **1. 类中定义的任何函数(默认情况下)都必须固定第一个`self`参数的存在,  所以如果是以类为主体使用类中的函数时, 就必须给self参数传递一个值, 不论这个值是什么**
 **2. 类可以当做一个容器对象来保存数据**
+
+----
+
+# 3. 类的实例化
+类的另一个非常重要的作用是: 实例化对象
+```python
+class Student(object):
+    school = '北京大学'
+    
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+stu1 = Student('stu1', 26)
+stu2 = Student('stu2', 26)
+
+print(stu1) # <__main__.Student object at 0x00000203080930F0>
+print(stu2) # <__main__.Student object at 0x0000020308093080>
+print(stu1.school) # 北京大学
+print(stu2.school) # 北京大学
+print(stu1.name) # 'stu1'
+print(stu2.name) # 'stu2'
+```
+
+> 1. 类可以被执行, 执行时传入的参数与`__init__`函数参数相对应(不用传self)
+> 2. 类的执行结果是一个对象, 有内存地址
+> 3. 类执行时参入参数的目的是为了初始化这个实例对象的某些属性值(当然也可以不初始化, 在后续配置)
+> 4. 类中的数据属性, 被所有此类对象共享 `北京大学`
+> 5. 类中的函数属性, 默认是绑定到对象的, 即每个对象都有一个绑定方法, 此方法的执行代码指向类中的此函数
+> 6. 每一个对象都有自己的属性值, 通过 对象.属性名 来访问和修改
+> 7. 类实例化的目的是为了得到一个对象, 程序中有了对象之后就可以相互交互, 完成程序的执行
+
+对象使用绑定方法
+> 1. 对象在创建时, `python`会将类中的普通方法做一些处理, 然后绑定到对象身上
+
+> 2. 对象在使用这些绑定方法时, 会自动的讲对象本身传入到此方法的第一个self参数中, 这样就可以在函数中引用到此对象
+
+> 3. 绑定方法是将函数和对象绑定在一起, 只要绑定方法被调用, 就会自动传入绑定的对象
+
+---
+
+# 四. 类的继承
+
+## 1. MRO
+```python
+class Animal(object):
+    pass
+
+class Human(Animal):
+    pass
+
+class Student(Human):
+    pass
+
+print(Student.mro())
+print(Student.__mro__)  # 二者等价，唯一的区别是上面结果是列表，下面是元组
+
+# 返回结果
+# [<class '__main__.Student'>, <class '__main__.Human'>, <class '__main__.Animal'>, <class 'object'>]
+# (<class '__main__.Student'>, <class '__main__.Human'>, <class '__main__.Animal'>, <class 'object'>)
+```
+> 1. 类可以继承, 如果我们把多个类的相同之处再提取出来, 就可以再次抽象出一个类, 此类作为所有子类的父类
+
+> 2. 继承类似家族数, 学科专业目录, 动物类别, 最顶层的是最抽象的类别, 越往下走, 类别越清晰, 继承树的末端就是各个具体的对象
+
+> 3. 我们可以使用`MRO`来表示一个类他向上方向的父类路径, MRO是一个通过算法计算得到的父类元组
+
+> 4. 任何一个类的MRO都可以表示他在继承树中的位置
+
+MRO的作用
+
+**MRO可以确定搜索路径**
+
+子类一旦继承父类, 就会自动继承父类所有的代码定义(实际并没有直接得到, 而是通过MRO搜索得到)
+
+继承的好处是不需要重复编写和父类相同的代码, 同时继承也可以明确的表示出**什么是什么**的结构关系, 坏处是继承使用的越多, 这个继承数上的耦合性就越强, 因为一旦顶层发生了变动, 下方所有子类都会受到影响
