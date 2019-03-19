@@ -183,21 +183,108 @@
 
 # show()
 
-class Wrapper:
-    def __init__(self, key):
-        self.key = key
+# class Wrapper:
+#     def __init__(self, key):
+#         self.key = key
 
-    def __call__(self, func):
-        self.func = func
+#     def __call__(self, func):
+#         self.func = func
 
-        def inner(*args, **kw):
-            print('start')
-            self.func(*args, **kw)
-            print('end')
-        return inner
+#         def inner(*args, **kw):
+#             print('start')
+#             self.func(*args, **kw)
+#             print('end')
+#         return inner
 
-@Wrapper('key')
-def show():
-    print('这里是show函数')
+# @Wrapper('key')
+# def show():
+#     print('这里是show函数')
 
-show()
+# show()
+
+# class Student:
+#     __instance = None
+
+#     def __new__(cls, *args, **kwargs):
+#         if cls.__new__ is None:
+#             obj = object.__new__(cls)
+#             cls.__init__(obj, *args, **kwargs)
+#             cls.__instance = obj
+
+#         return cls.__instance
+
+# stu1 = Student()
+# stu2 = Student()
+# print(stu1 is stu2)
+
+# class Student:
+#     def __init__(self, name, age):
+#         self.name = name
+#         self. age = age
+
+# stu = Student('foo', 26)
+# print(stu)
+
+
+# class Student:
+#     def __init__(self, name, age):
+#         self.name = name
+#         self.age = age
+
+#     def __str__(self):
+#         return f'{self.__class__}, {self.name}, {self.age}'
+
+#     __repr__ = __str__
+
+# stu = Student('foo', 26)
+# print(stu)
+
+
+# def args_num_require(require_num):
+#     def outer(func):
+#         def inner(*args, **kwargs):
+#             if len(args) != require_num:
+#                 print('函数参数个数不符合预定义，无法执行函数')
+#                 return None
+            
+#             return func(*args, **kwargs)
+#         return inner
+#     return outer
+
+# @args_num_require(2)
+# def show(*args):
+#     print('show函数成功执行')
+
+# show(1)
+# show(1,2)
+# show(1,2,3)
+
+
+# class Student:
+
+#     def __del__(self):
+#         print("调用对象的del方法, 此方法将会回收对象内存地址")
+
+# stu = Student()
+
+# del stu
+
+class Num:
+    def __init__(self, max_num):
+        self.max_num = max_num
+        self.count = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.count < self.max_num:
+            self.count += 1
+            return self.count
+        else:
+            raise StopIteration('已经到达临界')
+
+num = Num(20)
+for i in num:
+    print('count: ', num.count)
+    print(i)
