@@ -64,3 +64,11 @@ python3 setup.py build
 
 python3 setup.py install
 ```
+
+
+### 安装psycopg2失败后的解决方法
+```
+sudo apt-get install libpq-dev python-dev
+
+sudo pip3 install psycopg2
+```
