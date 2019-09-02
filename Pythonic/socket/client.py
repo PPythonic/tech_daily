@@ -47,7 +47,6 @@ class Client(object):
             response = self.recv()
             print(response.decode('utf-8'))
     
-
 if __name__ == "__main__":
     client = Client()
     client.run()

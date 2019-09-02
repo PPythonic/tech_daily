@@ -154,3 +154,8 @@ apt安装的通过 /etc/init.d/supervisor start 运行
 # supervisor stop all
 # supervisor start all
 ```
+
+# 增加任务
+```
+supervisorctl update
+```
